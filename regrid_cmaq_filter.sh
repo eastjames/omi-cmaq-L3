@@ -1,5 +1,6 @@
 #!/bin/bash
-#inf=OMI-Aura_L2-OMPIXCOR_2016m0701t1843-o63631_v003-2018m0301t214026.he5
+
+# OMIPIX file
 inf=${1}
 tmp=${inf}.tmp
 outf=omino2.nc
@@ -31,7 +32,6 @@ ncrename -O -v TiledCornerLatitude,lat_bnds -v TiledCornerLongitude,lon_bnds ${o
 ncpdq -O -a nTimes,nXtrack,Ncorners  ${outf} ${outf}
 
 # add data
-#inf2=OMI-Aura_L2-OMNO2_2016m0701t1843-o63631_v003-2019m0819t165356.he5
 inf2=${2}
 tmpf=omino2.tmp
 
@@ -43,7 +43,6 @@ ncpdq -O -a NumSWLevels,nTimes,nXtrack ${tmpf}.1 ${tmpf}.1
 ncks -O -v SolarZenithAngle,ViewingZenithAngle $tmpf ${tmpf}.2
 ncrename -O -d phony_dim_7,nTimes -d phony_dim_5,nXtrack ${tmpf}.2 ${tmpf}.2
 
-#ncks -A -v ColumnAmountNO2,XTrackQualityFlags,CloudFraction,VcdQualityFlags,ScatteringWeight,ScatteringWtPressure,SolarZenithAngle $tmpf $outf
 ncks -A ${tmpf}.1 $outf
 ncks -A ${tmpf}.2 $outf
 rm $tmpf
@@ -74,7 +73,6 @@ ncks -O -v latitude,longitude,latitude_bounds,longitude_bounds $qgridin $qgridou
 satf=omino2.nc
 
 # try to infer sat grid
-#ncremap --mask_src=validcol --msk_src=XTrackQualityFlags -d $satf -g grd.nc
 ncremap --mask_src=validcol -d $satf -g grd.nc
 
 # try to infer cmaq grid
