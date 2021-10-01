@@ -20,15 +20,12 @@ ncrename -O -a lat@Units,units  ${outf}
 ncatted -h -a long_name,lat,c,c,latitude -a bounds,lat,c,c,lat_bnds -a units,lat,o,c,degrees_north  ${outf}
 
 # shift and rename lon
-ncap2 -O -s 'where(Longitude<0) Longitude=Longitude+360' ${outf} ${outf}
 ncrename -O -v Longitude,lon ${outf}
 ncrename -O -a lon@Units,units  ${outf}
-ncatted -h -a long_name,lon,c,c,longitude -a bounds,lon,c,c,lon_bnds -a units,lon,o,c,degrees_east, -a ValidRange,lon,o,f,0,360  ${outf}
+ncatted -h -a long_name,lon,c,c,longitude -a bounds,lon,c,c,lon_bnds -a units,lon,o,c,degrees_east  ${outf}
 
 # rename bnds
 ncrename -O -v TiledCornerLatitude,lat_bnds -v TiledCornerLongitude,lon_bnds ${outf}
-ncap2 -O -s 'where(lon_bnds<0) lon_bnds=lon_bnds+360' ${outf} ${outf}
-ncatted -h -a ValidRange,lon_bnds,o,f,0,360  ${outf}
 
 # shift dim order
 ncpdq -O -a nTimes,nXtrack,Ncorners  ${outf} ${outf}
@@ -84,13 +81,10 @@ ncremap --mask_src=validcol -d $satf -g grd.nc
 ncremap -d $qgridout -g qgrd.nc
 
 # make map file from sat to global grid
-#for method in bilin aave conservative2nd nco_con
-for method in nco_con
-do
-  ncremap -a $method -s grd.nc -g qgrd.nc -m qmap.nc
-#  # regrid sat to global
-  ncremap --preserve=mean -m qmap.nc $satf dat_rgrcmaq_${method}.nc
-done
+ncremap --devnull=No -a $method -s grd.nc -g qgrd.nc -m qmap.nc
+
+# regrid sat to global
+ncremap --preserve=mean -m qmap.nc $satf dat_rgrcmaq_${method}.nc
 
 # clean
 rm vcdqf.nco omino2.nc cmaqgrid.nc grd.nc qgrd.nc qmap.nc
